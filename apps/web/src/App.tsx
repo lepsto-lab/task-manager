@@ -1,0 +1,34 @@
+import type { ReactNode } from 'react';
+import { Navigate, Route, Routes } from 'react-router';
+import { useTeams } from './api/queries';
+import { AppLayout } from './components/AppLayout';
+import { EmptyState, ListSkeleton } from './components/states';
+import { CurrentUserProvider } from './lib/currentUser';
+import { ToastProvider } from './lib/toast';
+import { NotFound } from './pages/NotFound';
+
+export function AppProviders({ children }: { children: ReactNode }) {
+  return (
+    <ToastProvider>
+      <CurrentUserProvider>{children}</CurrentUserProvider>
+    </ToastProvider>
+  );
+}
+
+function HomeRedirect() {
+  const { data: teams, isPending } = useTeams();
+  if (isPending) return <ListSkeleton />;
+  const first = teams?.[0];
+  return first ? <Navigate to={`/team/${first.key}/issues`} replace /> : <EmptyState title="No teams yet" />;
+}
+
+export function AppRoutes() {
+  return (
+    <Routes>
+      <Route element={<AppLayout />}>
+        <Route index element={<HomeRedirect />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
+    </Routes>
+  );
+}
