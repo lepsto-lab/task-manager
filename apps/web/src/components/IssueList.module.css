@@ -1,0 +1,36 @@
+.group {
+  width: 100%;
+  height: 36px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  border-bottom: 1px solid var(--divider);
+  background: var(--group-bg);
+  color: var(--text);
+  font-size: 13px;
+  text-align: left;
+}
+.group:hover {
+  background: var(--group-hover);
+}
+.chevron {
+  color: var(--text-muted);
+  transition: transform 0.15s;
+}
+.chevronOpen {
+  composes: chevron;
+  transform: rotate(90deg);
+}
+.groupIcon {
+  display: inline-flex;
+}
+.groupName {
+  font-weight: 500;
+}
+.items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
