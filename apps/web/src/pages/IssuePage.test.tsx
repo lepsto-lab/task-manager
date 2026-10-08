@@ -1,7 +1,8 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { http, HttpResponse } from 'msw';
 import { renderApp } from '../test/render';
-import { mock } from '../test/server';
+import { mock, server } from '../test/server';
 
 const lastPatch = () => mock.requests.filter((r) => r.method === 'PATCH').at(-1);
 
@@ -88,6 +89,45 @@ describe('IssuePage', () => {
     expect(await screen.findByRole('tab', { name: 'All issues' })).toBeInTheDocument();
     expect(mock.requests.some((r) => r.method === 'DELETE' && r.path === '/api/issues/i-1')).toBe(true);
     vi.restoreAllMocks();
+  });
+
+  it('shows a server-side description change and does not save it on focus+blur', async () => {
+    const { user, queryClient } = renderApp('/issue/DEV-1');
+    const description = await screen.findByRole('textbox', { name: 'Description' });
+    mock.state.descriptions['i-1'] = 'Changed remotely';
+    await queryClient.invalidateQueries({ queryKey: ['issue'] });
+    await waitFor(() => expect(description).toHaveValue('Changed remotely'));
+    await user.click(description);
+    await user.tab();
+    expect(lastPatch()).toBeUndefined();
+  });
+
+  it('keeps the typed title draft when the server title changes', async () => {
+    const { user, queryClient } = renderApp('/issue/DEV-1');
+    const title = await screen.findByRole('textbox', { name: 'Issue title' });
+    await user.type(title, ' typed');
+    mock.state.issues.find((i) => i.id === 'i-1')!.title = 'Remote title';
+    await queryClient.invalidateQueries({ queryKey: ['issue'] });
+    expect(title).toHaveValue('Crash on upload typed');
+  });
+
+  it('shows a toast and stays on the page when delete fails', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    server.use(http.delete('*/api/issues/:id', () => HttpResponse.json({ error: 'boom' }, { status: 500 })));
+    const { user } = renderApp('/issue/DEV-1');
+    await user.click(await screen.findByRole('button', { name: 'Delete' }));
+    expect(await screen.findByText(/Couldn't delete/)).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Issue title' })).toBeInTheDocument();
+    vi.restoreAllMocks();
+  });
+
+  it('shows a toast and keeps the text when posting a comment fails', async () => {
+    server.use(http.post('*/api/issues/:id/comments', () => HttpResponse.json({ error: 'boom' }, { status: 500 })));
+    const { user } = renderApp('/issue/DEV-1');
+    await user.type(await screen.findByRole('textbox', { name: 'Comment' }), 'Keep me');
+    await user.click(screen.getByRole('button', { name: 'Comment' }));
+    expect(await screen.findByText(/Couldn't post comment/)).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Comment' })).toHaveValue('Keep me');
   });
 
   it.each(['/issue/DEV-999', '/issue/garbage'])('shows "Issue not found" for %s', async (route) => {

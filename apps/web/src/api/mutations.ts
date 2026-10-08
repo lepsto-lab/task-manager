@@ -60,17 +60,21 @@ export function useCreateView() {
 
 export function useDeleteIssue() {
   const qc = useQueryClient();
+  const toast = useToast();
   return useMutation({
     mutationFn: api.deleteIssue,
     // Detail queries are left alone so the open page does not refetch a 404 before navigating away.
     onSuccess: () => invalidateIssueData(qc, ISSUE_DATA_KEYS.filter((key) => key !== 'issue')),
+    onError: (error) => toast.show(`Couldn't delete: ${error.message}`, 'error'),
   });
 }
 
 export function useAddComment() {
   const qc = useQueryClient();
+  const toast = useToast();
   return useMutation({
     mutationFn: ({ issueId, body }: { issueId: string; body: string }) => api.addComment(issueId, body),
     onSuccess: () => invalidateIssueData(qc, ['issue', 'inbox']),
+    onError: (error) => toast.show(`Couldn't post comment: ${error.message}`, 'error'),
   });
 }

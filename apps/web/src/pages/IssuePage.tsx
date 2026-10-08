@@ -1,5 +1,5 @@
 import type { ActivityEntry, CommentDto, IssueDetail, IssueStatus, IssueUpdateInput } from '@tm/shared';
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { ApiError } from '../api/client';
 import { useAddComment, useDeleteIssue, useUpdateIssue } from '../api/mutations';
@@ -50,7 +50,7 @@ function IssueDetailView({ issue }: { issue: IssueDetail }) {
   const save = (patch: IssueUpdateInput) => update.mutate({ id: issue.id, patch });
 
   const onDelete = () => {
-    if (!window.confirm(`Delete ${issue.key}? This cannot be undone.`)) return;
+    if (remove.isPending || !window.confirm(`Delete ${issue.key}? This cannot be undone.`)) return;
     remove.mutate(issue.id, { onSuccess: () => navigate(team ? `/team/${team.key}/issues` : '/') });
   };
 
@@ -71,7 +71,7 @@ function IssueDetailView({ issue }: { issue: IssueDetail }) {
       <div className={styles.body}>
         <article className={styles.article}>
           <div className={styles.content}>
-            <TitleEditor key={issue.title} value={issue.title} onSave={(title) => save({ title })} />
+            <TitleEditor key={issue.id} value={issue.title} onSave={(title) => save({ title })} />
             <DescriptionEditor key={issue.id} value={issue.description} onSave={(description) => save({ description })} />
             {issue.parent && (
               <Link className={styles.parentLink} to={`/issue/${issue.parent.key}`}>
@@ -100,33 +100,52 @@ function IssueDetailView({ issue }: { issue: IssueDetail }) {
   );
 }
 
-function TitleEditor({ value, onSave }: { value: string; onSave: (title: string) => void }) {
+function useDraft(value: string) {
   const [draft, setDraft] = useState(value);
+  const [dirty, setDirty] = useState(false);
+  useEffect(() => {
+    if (!dirty) setDraft(value);
+  }, [value, dirty]);
+  const edit = (next: string) => {
+    setDraft(next);
+    setDirty(true);
+  };
+  const reset = () => {
+    setDraft(value);
+    setDirty(false);
+  };
+  return { draft, dirty, edit, reset, clean: () => setDirty(false) };
+}
+
+function TitleEditor({ value, onSave }: { value: string; onSave: (title: string) => void }) {
+  const { draft, dirty, edit, reset, clean } = useDraft(value);
   const commit = () => {
+    if (!dirty) return;
     const title = draft.trim();
     if (!title) {
-      setDraft(value);
+      reset();
       return;
     }
     if (title !== value) onSave(title);
+    clean();
   };
   return (
     <input
       className={styles.title}
       aria-label="Issue title"
       value={draft}
-      onChange={(e) => setDraft(e.target.value)}
+      onChange={(e) => edit(e.target.value)}
       onBlur={commit}
       onKeyDown={(e) => {
         if (e.key === 'Enter') e.currentTarget.blur();
-        if (e.key === 'Escape') setDraft(value);
+        if (e.key === 'Escape') reset();
       }}
     />
   );
 }
 
 function DescriptionEditor({ value, onSave }: { value: string; onSave: (description: string) => void }) {
-  const [draft, setDraft] = useState(value);
+  const { draft, dirty, edit, clean } = useDraft(value);
   return (
     <textarea
       className={styles.description}
@@ -134,9 +153,11 @@ function DescriptionEditor({ value, onSave }: { value: string; onSave: (descript
       placeholder="Add description…"
       rows={Math.max(3, draft.split('\n').length + 1)}
       value={draft}
-      onChange={(e) => setDraft(e.target.value)}
+      onChange={(e) => edit(e.target.value)}
       onBlur={() => {
+        if (!dirty) return;
         if (draft !== value) onSave(draft);
+        clean();
       }}
     />
   );
