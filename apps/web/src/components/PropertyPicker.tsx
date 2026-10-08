@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { cx } from '../lib/cx';
 import { useDismiss } from '../lib/useDismiss';
 import { CheckIcon } from './icons';
@@ -39,7 +39,30 @@ export function PropertyPicker<T extends string>(props: SingleProps<T> | Multipl
   const [query, setQuery] = useState('');
   const rootRef = useRef<HTMLDivElement>(null);
   const close = useCallback(() => setOpen(false), []);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   useDismiss(rootRef, open, close);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.stopPropagation();
+      event.preventDefault();
+      setOpen(false);
+      triggerRef.current?.focus();
+    };
+    document.addEventListener('keydown', onKey, true);
+    return () => document.removeEventListener('keydown', onKey, true);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open || props.searchable) return;
+    const options = listRef.current?.querySelectorAll<HTMLElement>('[role="option"]');
+    const target = listRef.current?.querySelector<HTMLElement>('[aria-selected="true"]') ?? options?.[0];
+    target?.focus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const selected = new Set<string>(props.multiple ? props.value : [props.value]);
   const needle = query.trim().toLowerCase();
@@ -51,6 +74,7 @@ export function PropertyPicker<T extends string>(props: SingleProps<T> | Multipl
       return;
     }
     setOpen(false);
+    triggerRef.current?.focus();
     if (value !== props.value) props.onChange(value);
   };
 
@@ -59,14 +83,13 @@ export function PropertyPicker<T extends string>(props: SingleProps<T> | Multipl
       ref={rootRef}
       className={cx(styles.root, open && styles.open, props.className)}
       onClick={(e) => e.stopPropagation()}
-      onKeyDown={(e) => {
-        if (e.key === 'Escape' && open) {
-          e.stopPropagation();
-          setOpen(false);
-        }
+      onBlur={(e) => {
+        const next = e.relatedTarget as Node | null;
+        if (open && next && !e.currentTarget.contains(next)) setOpen(false);
       }}
     >
       <button
+        ref={triggerRef}
         type="button"
         className={props.triggerClassName ?? styles.trigger}
         aria-label={props.triggerLabel ?? props.label}
@@ -82,8 +105,12 @@ export function PropertyPicker<T extends string>(props: SingleProps<T> | Multipl
       </button>
       {open && (
         <div
+          ref={listRef}
           className={cx(styles.popover, props.align === 'end' && styles.end)}
-          role="listbox" aria-label={props.label} aria-multiselectable={props.multiple || undefined}>
+          role="listbox"
+          aria-label={props.label}
+          aria-multiselectable={props.multiple || undefined}
+        >
           {props.searchable && (
             <input
               autoFocus
