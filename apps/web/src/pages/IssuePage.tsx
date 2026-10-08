@@ -71,8 +71,8 @@ function IssueDetailView({ issue }: { issue: IssueDetail }) {
       <div className={styles.body}>
         <article className={styles.article}>
           <div className={styles.content}>
-            <TitleEditor key={issue.id} value={issue.title} onSave={(title) => save({ title })} />
-            <DescriptionEditor key={issue.id} value={issue.description} onSave={(description) => save({ description })} />
+            <TitleEditor key={`title-${issue.id}`} value={issue.title} onSave={(title) => save({ title })} />
+            <DescriptionEditor key={`description-${issue.id}`} value={issue.description} onSave={(description) => save({ description })} />
             {issue.parent && (
               <Link className={styles.parentLink} to={`/issue/${issue.parent.key}`}>
                 Sub-issue of <StatusIcon status={issue.parent.status} />
