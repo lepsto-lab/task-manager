@@ -3,11 +3,13 @@ import { ZodError } from 'zod';
 import type { DbOrTx } from './db/client';
 import { HttpError } from './errors';
 import { cycleRoutes } from './routes/cycles';
+import { inboxRoutes } from './routes/inbox';
 import { issueRoutes } from './routes/issues';
 import { labelRoutes } from './routes/labels';
 import { projectRoutes } from './routes/projects';
 import { teamRoutes } from './routes/teams';
 import { userRoutes } from './routes/users';
+import { viewRoutes } from './routes/views';
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -54,6 +56,8 @@ export async function buildApp({ db, logger = false }: AppOptions) {
       await api.register(projectRoutes);
       await api.register(cycleRoutes);
       await api.register(issueRoutes);
+      await api.register(inboxRoutes);
+      await api.register(viewRoutes);
     },
     { prefix: '/api' },
   );
