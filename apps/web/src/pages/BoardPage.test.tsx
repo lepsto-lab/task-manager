@@ -1,5 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { groupByStatus, moveFromDragEnd } from '../lib/boardMove';
 import { renderApp } from '../test/render';
 import { mock } from '../test/server';
 
@@ -52,5 +53,26 @@ describe('BoardPage', () => {
   it('switches to the list view keeping the query string', async () => {
     renderApp('/team/DEV/board?status=todo');
     expect(await screen.findByRole('link', { name: 'List' })).toHaveAttribute('href', '/team/DEV/issues?status=todo');
+  });
+
+  it('keeps the title link and priority picker keyboard-operable on a card', async () => {
+    const { user } = renderApp('/team/DEV/board');
+    const link = await screen.findByRole('link', { name: 'Export to CSV' });
+    const card = link.closest('article')!;
+    within(card).getByRole('button', { name: 'Priority: Low' }).focus();
+    await user.keyboard(' ');
+    expect(await screen.findByRole('option', { name: 'High' })).toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    link.focus();
+    await user.keyboard('{Enter}');
+    expect(await screen.findByText('Page not found')).toBeInTheDocument();
+  });
+
+  it('maps a column drop to a status and sortOrder patch', () => {
+    const a = { id: 'a', status: 'todo', sortOrder: 1000 } as never;
+    const cols = groupByStatus([a, { id: 'b', status: 'done', sortOrder: 1000 } as never]);
+    expect(moveFromDragEnd(cols, 'a', 'column:done')).toEqual({ status: 'done', sortOrder: 2000 });
+    expect(moveFromDragEnd(cols, 'a', 'b')).toEqual({ status: 'done', sortOrder: 0 });
+    expect(moveFromDragEnd(cols, 'a', 'a')).toBeNull();
   });
 });

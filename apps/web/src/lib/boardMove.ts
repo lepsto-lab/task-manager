@@ -48,3 +48,7 @@ export function planMove(
   if (from === to && index === columns[from].findIndex((i) => i.id === activeId)) return null;
   return { status: to, sortOrder: sortOrderBetween(target[index - 1]?.sortOrder, target[index]?.sortOrder) };
 }
+
+export function moveFromDragEnd(columns: Columns, activeId: string, overId: string) {
+  return planMove(columns, activeId, overId);
+}

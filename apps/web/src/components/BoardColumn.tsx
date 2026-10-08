@@ -26,7 +26,7 @@ export function BoardColumn({ status, issues, onAdd }: { status: IssueStatus; is
   const { setNodeRef, isOver } = useDroppable({ id: columnId(status) });
   const label = STATUS_LABELS[status];
   return (
-    <section aria-label={label} className={cx(styles.column, isOver && styles.over)}>
+    <section ref={setNodeRef} aria-label={label} className={cx(styles.column, isOver && styles.over)}>
       <div className={styles.header}>
         <span aria-hidden="true">
           <StatusIcon status={status} />
@@ -41,7 +41,7 @@ export function BoardColumn({ status, issues, onAdd }: { status: IssueStatus; is
         </button>
       </div>
       <SortableContext id={columnId(status)} items={issues.map((i) => i.id)} strategy={verticalListSortingStrategy}>
-        <div ref={setNodeRef} className={styles.cards}>
+        <div className={styles.cards}>
           {issues.map((issue) => (
             <SortableCard key={issue.id} issue={issue} />
           ))}
