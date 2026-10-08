@@ -23,6 +23,7 @@ export function useUpdateIssue() {
   const qc = useQueryClient();
   const toast = useToast();
   return useMutation({
+    mutationKey: ['updateIssue'],
     mutationFn: ({ id, patch }: { id: string; patch: IssueUpdateInput }) => api.updateIssue(id, patch),
     onMutate: async ({ id, patch }) => {
       await Promise.all([qc.cancelQueries({ queryKey: ['issues'] }), qc.cancelQueries({ queryKey: ['issue'] })]);
@@ -46,7 +47,9 @@ export function useUpdateIssue() {
       context?.details.forEach(([key, data]) => qc.setQueryData(key, data));
       toast.show(`Couldn't save: ${error.message}`, 'error');
     },
-    onSettled: () => invalidateIssueData(qc),
+    onSettled: () => {
+      if (qc.isMutating({ mutationKey: ['updateIssue'] }) === 1) return invalidateIssueData(qc);
+    },
   });
 }
 

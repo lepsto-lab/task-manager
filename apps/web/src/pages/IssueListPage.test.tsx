@@ -82,6 +82,36 @@ describe('IssueListPage', () => {
     );
   });
 
+  it('refetches only once after overlapping edits and keeps both optimistic values', async () => {
+    let n = 0;
+    server.use(
+      http.patch('*/api/issues/:id', async ({ request, params }) => {
+        await delay(n++ === 0 ? 120 : 20);
+        const body = (await request.json()) as Record<string, unknown>;
+        const issue = mock.state.issues.find((i) => i.id === params.id)!;
+        Object.assign(issue, body);
+        return HttpResponse.json(issue);
+      }),
+    );
+    const { user } = renderApp('/team/DEV/issues');
+    const row = await rowOf('Export to CSV');
+    const before = mock.requests.filter((r) => r.method === 'GET' && r.path.startsWith('/api/issues?')).length;
+    await user.click(within(row).getByRole('button', { name: 'Priority: Low' }));
+    await user.click(screen.getByRole('option', { name: 'Urgent' }));
+    await user.click(within(row).getByRole('button', { name: 'Status: Todo' }));
+    await user.click(screen.getByRole('option', { name: 'In Progress' }));
+    const moved = await within(group('In Progress')).findByRole('link', { name: 'Export to CSV' });
+    const movedRow = moved.closest('li')!;
+    expect(within(movedRow).getByRole('button', { name: 'Priority: Urgent' })).toBeInTheDocument();
+    await waitFor(() => expect(n).toBe(2));
+    await new Promise((r) => setTimeout(r, 300));
+    const after = mock.requests.filter((r) => r.method === 'GET' && r.path.startsWith('/api/issues?')).length;
+    expect(after - before).toBe(1);
+    const finalRow = (await screen.findByRole('link', { name: 'Export to CSV' })).closest('li')!;
+    expect(within(finalRow).getByRole('button', { name: 'Priority: Urgent' })).toBeInTheDocument();
+    expect(within(group('In Progress')).getByRole('link', { name: 'Export to CSV' })).toBeInTheDocument();
+  });
+
   it('remembers the compact density', async () => {
     const { user } = renderApp('/team/DEV/issues');
     await screen.findByRole('link', { name: 'Crash on upload' });
