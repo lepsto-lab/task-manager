@@ -1,3 +1,4 @@
+import { buildApp } from '../src/app';
 import { env } from '../src/config';
 import { createDb, type DbOrTx } from '../src/db/client';
 import * as s from '../src/db/schema';
@@ -56,4 +57,24 @@ export async function insertIssue(
     .values({ number: 10_000 + counter, title: `Issue ${counter}`, sortOrder: counter * 1000, ...values })
     .returning();
   return row;
+}
+
+export async function createTestApp() {
+  const { db, pool } = openTestDb();
+  const app = await buildApp({ db });
+  await app.ready();
+  return {
+    app,
+    db,
+    close: async () => {
+      await app.close();
+      await pool.end();
+    },
+  };
+}
+
+export type TestContext = Awaited<ReturnType<typeof createTestApp>>;
+
+export function as(user: { id: string }) {
+  return { 'x-user-id': user.id };
 }
