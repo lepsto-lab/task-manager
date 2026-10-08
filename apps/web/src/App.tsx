@@ -6,6 +6,7 @@ import { EmptyState, ListSkeleton } from './components/states';
 import { CurrentUserProvider } from './lib/currentUser';
 import { NewIssueProvider } from './lib/newIssue';
 import { ToastProvider } from './lib/toast';
+import { BoardPage } from './pages/BoardPage';
 import { IssueListPage } from './pages/IssueListPage';
 import { NotFound } from './pages/NotFound';
 
@@ -32,6 +33,7 @@ export function AppRoutes() {
       <Route element={<AppLayout />}>
         <Route index element={<HomeRedirect />} />
         <Route path="team/:teamKey/issues" element={<IssueListPage />} />
+        <Route path="team/:teamKey/board" element={<BoardPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
