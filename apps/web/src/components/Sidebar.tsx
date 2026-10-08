@@ -58,8 +58,9 @@ export function Sidebar({ onNewIssue }: { onNewIssue?: () => void }) {
       <div className={styles.group}>
         <div className={styles.heading}>Your teams</div>
         {teams.map((team, index) => {
-          const open = expanded[team.id] ?? index === 0;
           const base = `/team/${team.key}`;
+          const onTeamRoute = pathname.startsWith('/team/');
+          const open = expanded[team.id] ?? (onTeamRoute ? pathname.startsWith(`${base}/`) : index === 0);
           const issuesActive = pathname.startsWith(`${base}/issues`) || pathname.startsWith(`${base}/board`);
           return (
             <div key={team.id} className={styles.group}>
