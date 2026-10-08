@@ -8,14 +8,18 @@ import styles from './lists.module.css';
 import { NotFound } from './NotFound';
 import page from './page.module.css';
 
-const today = () => new Date().toISOString().slice(0, 10);
+const today = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
 
 export function CyclesPage() {
   const { teamKey = '' } = useParams();
-  const { team, isLoading } = useTeamByKey(teamKey);
+  const { team, isLoading, error: teamsError, refetch: refetchTeams } = useTeamByKey(teamKey);
   const cycles = useCycles(team?.id);
 
   if (isLoading) return <ListSkeleton />;
+  if (!team && teamsError) return <ErrorState error={teamsError} onRetry={() => void refetchTeams()} />;
   if (!team) return <NotFound title="Team not found" />;
 
   const now = today();

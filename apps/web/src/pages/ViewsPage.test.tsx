@@ -1,7 +1,8 @@
+import { http, HttpResponse } from 'msw';
 import { screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { renderApp } from '../test/render';
-import { mock } from '../test/server';
+import { mock, server } from '../test/server';
 
 async function saveTodoView() {
   const utils = renderApp('/team/DEV/issues?status=todo');
@@ -24,6 +25,17 @@ describe('views', () => {
     await saveTodoView();
     expect(await screen.findByRole('link', { name: 'Export to CSV' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Crash on upload' })).not.toBeInTheDocument();
+  });
+
+  it("toasts when saving a view fails", async () => {
+    server.use(http.post('*/api/views', () => HttpResponse.json({ error: { code: 'internal', message: 'boom' } }, { status: 500 })));
+    const utils = renderApp('/team/DEV/issues?status=todo');
+    await screen.findByRole('link', { name: 'Export to CSV' });
+    await utils.user.click(screen.getByRole('button', { name: /^Filter/ }));
+    await utils.user.click(screen.getByRole('button', { name: 'Save as view' }));
+    await utils.user.type(screen.getByRole('textbox', { name: 'View name' }), 'Todo only');
+    await utils.user.click(screen.getByRole('button', { name: 'Save' }));
+    expect(await screen.findByText(/Couldn't save view: /)).toBeInTheDocument();
   });
 
   it('renames a view', async () => {

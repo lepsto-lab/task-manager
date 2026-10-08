@@ -54,7 +54,7 @@ export function ViewPage() {
 
   if (view.isPending) return <ListSkeleton />;
   if (view.isError) {
-    return view.error instanceof ApiError && view.error.status === 404 ? (
+    return view.error instanceof ApiError && [400, 404].includes(view.error.status) ? (
       <NotFound title="View not found" />
     ) : (
       <ErrorState error={view.error} />

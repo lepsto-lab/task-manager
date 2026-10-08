@@ -41,7 +41,7 @@ class CardKeyboardSensor extends KeyboardSensor {
 
 export function BoardPage() {
   const { teamKey = '' } = useParams();
-  const { team, isLoading } = useTeamByKey(teamKey);
+  const { team, isLoading, error: teamsError, refetch: refetchTeams } = useTeamByKey(teamKey);
   const [sp] = useSearchParams();
   const issues = useIssues({ teamId: team?.id, ...filtersFromSearch(sp) }, { enabled: !!team });
   const update = useUpdateIssue();
@@ -54,6 +54,7 @@ export function BoardPage() {
   const columns = useMemo(() => groupByStatus(issues.data ?? []), [issues.data]);
 
   if (isLoading) return <ListSkeleton />;
+  if (!team && teamsError) return <ErrorState error={teamsError} onRetry={() => void refetchTeams()} />;
   if (!team) return <NotFound title="Team not found" />;
 
   const dragged = draggedId ? issues.data?.find((i) => i.id === draggedId) : undefined;

@@ -20,7 +20,7 @@ export function CyclePage() {
 
   if (cycle.isPending) return <ListSkeleton />;
   if (cycle.isError) {
-    return cycle.error instanceof ApiError && cycle.error.status === 404 ? (
+    return cycle.error instanceof ApiError && [400, 404].includes(cycle.error.status) ? (
       <NotFound title="Cycle not found" />
     ) : (
       <ErrorState error={cycle.error} />

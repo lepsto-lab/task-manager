@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Navigate, Route, Routes } from 'react-router';
 import { useTeams } from './api/queries';
 import { AppLayout } from './components/AppLayout';
-import { EmptyState, ListSkeleton } from './components/states';
+import { EmptyState, ErrorState, ListSkeleton } from './components/states';
 import { CurrentUserProvider } from './lib/currentUser';
 import { NewIssueProvider } from './lib/newIssue';
 import { ToastProvider } from './lib/toast';
@@ -30,8 +30,9 @@ export function AppProviders({ children }: { children: ReactNode }) {
 }
 
 function HomeRedirect() {
-  const { data: teams, isPending } = useTeams();
+  const { data: teams, isPending, error, refetch } = useTeams();
   if (isPending) return <ListSkeleton />;
+  if (error && !teams) return <ErrorState error={error} onRetry={() => void refetch()} />;
   const first = teams?.[0];
   return first ? <Navigate to={`/team/${first.key}/issues`} replace /> : <EmptyState title="No teams yet" />;
 }

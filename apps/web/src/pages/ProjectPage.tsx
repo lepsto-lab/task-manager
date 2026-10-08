@@ -18,7 +18,7 @@ export function ProjectPage() {
 
   if (project.isPending) return <ListSkeleton />;
   if (project.isError) {
-    return project.error instanceof ApiError && project.error.status === 404 ? (
+    return project.error instanceof ApiError && [400, 404].includes(project.error.status) ? (
       <NotFound title="Project not found" />
     ) : (
       <ErrorState error={project.error} />

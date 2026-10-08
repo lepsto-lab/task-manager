@@ -7,6 +7,8 @@ import type {
   IssueUpdateInput,
   Label,
   User,
+  View,
+  ViewFilters,
   ViewUpdateInput,
 } from '@tm/shared';
 import { applyPatch } from '../lib/applyPatch';
@@ -64,7 +66,12 @@ export function useUpdateIssue() {
 
 export function useCreateView() {
   const qc = useQueryClient();
-  return useMutation({ mutationFn: api.createView, onSuccess: () => qc.invalidateQueries({ queryKey: qk.views }) });
+  const toast = useToast();
+  return useMutation({
+    mutationFn: api.createView,
+    onSuccess: () => qc.invalidateQueries({ queryKey: qk.views }),
+    onError: (error) => toast.show(`Couldn't save view: ${error.message}`, 'error'),
+  });
 }
 
 export function useDeleteIssue() {
@@ -127,11 +134,24 @@ export function useUpdateView(id: string) {
   const toast = useToast();
   return useMutation({
     mutationFn: (input: ViewUpdateInput) => api.updateView(id, input),
+    onMutate: async (input) => {
+      await qc.cancelQueries({ queryKey: qk.view(id) });
+      const previous = qc.getQueryData<View>(qk.view(id));
+      if (previous) qc.setQueryData<View>(qk.view(id), {
+          ...previous,
+          name: input.name ?? previous.name,
+          filters: (input.filters as ViewFilters | undefined) ?? previous.filters,
+        });
+      return { previous };
+    },
     onSuccess: (view) => {
       qc.setQueryData(qk.view(id), view);
       void qc.invalidateQueries({ queryKey: qk.views });
     },
-    onError: (error) => toast.show(`Couldn't save view: ${error.message}`, 'error'),
+    onError: (error, _input, context) => {
+      if (context?.previous) qc.setQueryData(qk.view(id), context.previous);
+      toast.show(`Couldn't save view: ${error.message}`, 'error');
+    },
   });
 }
 

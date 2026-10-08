@@ -23,7 +23,13 @@ export const useTeams = () => useQuery({ queryKey: qk.teams, queryFn: api.teams,
 
 export function useTeamByKey(key: string) {
   const query = useTeams();
-  return { team: query.data?.find((t) => t.key === key.toUpperCase()), isLoading: query.isPending };
+  return {
+    team: query.data?.find((t) => t.key === key.toUpperCase()),
+    isLoading: query.isPending,
+    isError: query.isError,
+    error: query.error,
+    refetch: query.refetch,
+  };
 }
 
 export const useLabels = (teamId?: string) =>
