@@ -3,6 +3,7 @@ import { ZodError } from 'zod';
 import type { DbOrTx } from './db/client';
 import { HttpError } from './errors';
 import { cycleRoutes } from './routes/cycles';
+import { issueRoutes } from './routes/issues';
 import { labelRoutes } from './routes/labels';
 import { projectRoutes } from './routes/projects';
 import { teamRoutes } from './routes/teams';
@@ -52,6 +53,7 @@ export async function buildApp({ db, logger = false }: AppOptions) {
       await api.register(labelRoutes);
       await api.register(projectRoutes);
       await api.register(cycleRoutes);
+      await api.register(issueRoutes);
     },
     { prefix: '/api' },
   );

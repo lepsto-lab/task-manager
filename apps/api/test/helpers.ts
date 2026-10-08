@@ -1,3 +1,4 @@
+import type { IssueDetail } from '@tm/shared';
 import { buildApp } from '../src/app';
 import { env } from '../src/config';
 import { createDb, type DbOrTx } from '../src/db/client';
@@ -77,4 +78,14 @@ export type TestContext = Awaited<ReturnType<typeof createTestApp>>;
 
 export function as(user: { id: string }) {
   return { 'x-user-id': user.id };
+}
+
+export async function createIssueVia(
+  ctx: TestContext,
+  user: { id: string },
+  body: Record<string, unknown>,
+): Promise<IssueDetail> {
+  const res = await ctx.app.inject({ method: 'POST', url: '/api/issues', headers: as(user), payload: body });
+  if (res.statusCode !== 201) throw new Error(`create failed: ${res.statusCode} ${res.body}`);
+  return res.json() as IssueDetail;
 }
