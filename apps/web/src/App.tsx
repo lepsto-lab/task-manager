@@ -4,13 +4,16 @@ import { useTeams } from './api/queries';
 import { AppLayout } from './components/AppLayout';
 import { EmptyState, ListSkeleton } from './components/states';
 import { CurrentUserProvider } from './lib/currentUser';
+import { NewIssueProvider } from './lib/newIssue';
 import { ToastProvider } from './lib/toast';
 import { NotFound } from './pages/NotFound';
 
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <ToastProvider>
-      <CurrentUserProvider>{children}</CurrentUserProvider>
+      <CurrentUserProvider>
+        <NewIssueProvider>{children}</NewIssueProvider>
+      </CurrentUserProvider>
     </ToastProvider>
   );
 }
