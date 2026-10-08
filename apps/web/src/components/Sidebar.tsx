@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
+import { parseIssueKey } from '@tm/shared';
 import { NavLink, useLocation } from 'react-router';
 import { useInbox, useTeams } from '../api/queries';
 import { useCurrentUser } from '../lib/currentUser';
@@ -22,12 +23,20 @@ function NavItem({ to, icon, label, count }: { to: string; icon: ReactNode; labe
   );
 }
 
+function teamKeyFromPath(pathname: string): string | null {
+  const team = /^\/team\/([^/]+)/.exec(pathname);
+  if (team) return decodeURIComponent(team[1]);
+  const issue = /^\/issue\/([^/]+)/.exec(pathname);
+  return issue ? (parseIssueKey(decodeURIComponent(issue[1]))?.teamKey ?? null) : null;
+}
+
 export function Sidebar({ onNewIssue }: { onNewIssue?: () => void }) {
   const { data: teams = [] } = useTeams();
   const { user, users, setUserId } = useCurrentUser();
   const { data: inbox } = useInbox(user?.id ?? null);
   const { pathname } = useLocation();
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const activeTeamKey = teamKeyFromPath(pathname);
 
   return (
     <nav className={styles.sidebar} aria-label="Main navigation">
@@ -59,8 +68,7 @@ export function Sidebar({ onNewIssue }: { onNewIssue?: () => void }) {
         <div className={styles.heading}>Your teams</div>
         {teams.map((team, index) => {
           const base = `/team/${team.key}`;
-          const onTeamRoute = pathname.startsWith('/team/');
-          const open = expanded[team.id] ?? (onTeamRoute ? pathname.startsWith(`${base}/`) : index === 0);
+          const open = expanded[team.id] ?? (activeTeamKey ? team.key === activeTeamKey : index === 0);
           const issuesActive = pathname.startsWith(`${base}/issues`) || pathname.startsWith(`${base}/board`);
           return (
             <div key={team.id} className={styles.group}>

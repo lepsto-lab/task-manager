@@ -18,6 +18,24 @@ describe('Sidebar', () => {
     expect(hrefs).toEqual(['/team/DEV/issues', '/team/DES/issues']);
   });
 
+  it('expands the team of a team route', async () => {
+    renderApp('/team/DES/issues');
+    expect(await screen.findByRole('button', { name: 'Design' })).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('button', { name: 'Engineering' })).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('expands the team for a bare team route', async () => {
+    renderApp('/team/DES');
+    expect(await screen.findByRole('button', { name: 'Design' })).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('button', { name: 'Engineering' })).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it("expands the issue key's team on an issue route", async () => {
+    renderApp('/issue/DES-1');
+    expect(await screen.findByRole('button', { name: 'Design' })).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('button', { name: 'Engineering' })).toHaveAttribute('aria-expanded', 'false');
+  });
+
   it("switches the current user, persists the choice and shows that user's inbox", async () => {
     const { user } = renderApp('/nowhere');
     await screen.findByLabelText('2 unread');
