@@ -1,0 +1,75 @@
+.icon,
+.boxed,
+.full,
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+}
+.icon {
+  width: 24px;
+  height: 24px;
+  justify-content: center;
+}
+.icon:hover {
+  background: var(--btn-hover);
+}
+.boxed {
+  width: 22px;
+  height: 22px;
+  justify-content: center;
+  border: 1px solid var(--surface-border);
+}
+.full {
+  width: 100%;
+  min-height: 34px;
+  padding: 4px 8px;
+  flex-wrap: wrap;
+  text-align: left;
+}
+.full:hover {
+  background: #1a1a1f;
+}
+.chip {
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--surface-border);
+  font-size: 12px;
+}
+.chip:hover {
+  background: var(--btn-hover);
+}
+.block {
+  display: flex;
+  width: 100%;
+}
+.chips {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.date {
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text);
+}
+.date:hover,
+.date:focus {
+  border-color: var(--surface-border);
+  outline: none;
+}
