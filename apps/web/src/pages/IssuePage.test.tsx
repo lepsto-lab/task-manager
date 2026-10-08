@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { http, HttpResponse } from 'msw';
 import { renderApp } from '../test/render';
@@ -27,6 +27,28 @@ describe('IssuePage', () => {
     await user.type(title, 'Crash on big upload');
     await user.tab();
     await waitFor(() => expect(lastPatch()?.body).toEqual({ title: 'Crash on big upload' }));
+  });
+
+  it('sends one PATCH for the due date, on blur, not per keystroke', async () => {
+    const { user } = renderApp('/issue/DEV-1');
+    const due = await screen.findByLabelText('Due date');
+    await user.click(due);
+    for (const value of ['0002-10-20', '0020-10-20', '0202-10-20', '2026-10-20']) {
+      fireEvent.change(due, { target: { value } });
+    }
+    expect(due).toHaveValue('2026-10-20');
+    expect(mock.requests.filter((r) => r.method === 'PATCH')).toHaveLength(0);
+    await user.tab();
+    await waitFor(() => expect(mock.requests.filter((r) => r.method === 'PATCH')).toHaveLength(1));
+    expect(lastPatch()?.body).toEqual({ dueDate: '2026-10-20' });
+  });
+
+  it('does not PATCH the due date when it did not change', async () => {
+    const { user } = renderApp('/issue/DEV-1');
+    const due = await screen.findByLabelText('Due date');
+    await user.click(due);
+    await user.tab();
+    expect(lastPatch()).toBeUndefined();
   });
 
   it('does not save a blank title', async () => {

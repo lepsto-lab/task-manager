@@ -8,6 +8,7 @@ import {
   type IssueStatus,
   type User,
 } from '@tm/shared';
+import { useEffect, useRef, useState } from 'react';
 import { useCycles, useLabels, useProjects, useUsers } from '../api/queries';
 import { cycleName, formatEstimate } from '../lib/format';
 import { PriorityIcon, ProjectIcon, StatusIcon } from './icons';
@@ -246,13 +247,33 @@ export function EstimatePicker({
 }
 
 export function DueDateField({ value, onChange }: { value: string | null; onChange: (value: string | null) => void }) {
+  const [draft, setDraft] = useState(value ?? '');
+  const focused = useRef(false);
+  // Resync from the saved value, but never while the user is typing.
+  useEffect(() => {
+    if (!focused.current) setDraft(value ?? '');
+  }, [value]);
+
+  const commit = () => {
+    focused.current = false;
+    const next = draft || null;
+    if (next !== value) onChange(next);
+  };
+
   return (
     <input
       type="date"
       className={styles.date}
       aria-label="Due date"
-      value={value ?? ''}
-      onChange={(e) => onChange(e.target.value || null)}
+      value={draft}
+      onFocus={() => {
+        focused.current = true;
+      }}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={commit}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') e.currentTarget.blur();
+      }}
     />
   );
 }
