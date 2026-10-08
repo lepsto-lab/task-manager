@@ -1,8 +1,9 @@
+import { asc } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { users } from '../src/db/schema';
+import { teams, users } from '../src/db/schema';
 import { seed } from '../src/db/seed';
 import { getInbox } from '../src/services/inbox';
-import { getIssueByKey, listIssues } from '../src/services/issues';
+import { createIssue, getIssueByKey, listIssues } from '../src/services/issues';
 import { openTestDb } from './helpers';
 
 const { db, pool } = openTestDb();
@@ -39,6 +40,15 @@ describe('seed', () => {
     const all = await listIssues(db, {}, null);
     expect(all.filter((i) => i.key.startsWith('DEV-'))).toHaveLength(17);
     expect(all.filter((i) => i.key.startsWith('DES-'))).toHaveLength(2);
+  });
+
+  it('orders teams by creation and continues the DEV counter', async () => {
+    const rows = await db.select().from(teams).orderBy(asc(teams.createdAt));
+    expect(rows.map((t) => t.key)).toEqual(['DEV', 'DES']);
+    expect(rows[0].issueCounter).toBe(161);
+    const [anna] = (await db.select().from(users)).filter((u) => u.initials === 'AR');
+    const created = await createIssue(db, { teamId: rows[0].id, title: 'Next one' }, anna.id);
+    expect(created.key).toBe('DEV-162');
   });
 
   it('gives Anna three unread inbox items', async () => {

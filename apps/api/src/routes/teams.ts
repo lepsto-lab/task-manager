@@ -10,6 +10,6 @@ export async function teamRoutes(app: FastifyInstance) {
       app.db
         .select({ id: teams.id, name: teams.name, key: teams.key, color: teams.color })
         .from(teams)
-        .orderBy(asc(teams.name)),
+        .orderBy(asc(teams.createdAt), asc(teams.name)),
   );
 }

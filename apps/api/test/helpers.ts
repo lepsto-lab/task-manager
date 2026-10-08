@@ -21,12 +21,13 @@ export async function seedFixture(db: DbOrTx) {
       { name: 'Bob Roe', initials: 'BR', color: '#2F7D6D' },
     ])
     .returning();
-  const [dev, des] = await db
+  const [dev] = await db
     .insert(s.teams)
-    .values([
-      { name: 'Engineering', key: 'DEV', color: '#2F7D6D' },
-      { name: 'Design', key: 'DES', color: '#B5582F' },
-    ])
+    .values({ name: 'Engineering', key: 'DEV', color: '#2F7D6D', createdAt: new Date('2026-09-01T09:00:00Z') })
+    .returning();
+  const [des] = await db
+    .insert(s.teams)
+    .values({ name: 'Design', key: 'DES', color: '#B5582F', createdAt: new Date('2026-09-02T09:00:00Z') })
     .returning();
   const [bug, feat] = await db
     .insert(s.labels)

@@ -82,12 +82,13 @@ export async function seed(db: DbOrTx): Promise<void> {
     const userRows = await tx.insert(users).values(USERS).returning();
     const user = Object.fromEntries(userRows.map((u) => [u.initials, u])) as Record<Who, (typeof userRows)[number]>;
 
-    const [dev, des] = await tx
+    const [dev] = await tx
       .insert(teams)
-      .values([
-        { name: 'Engineering', key: 'DEV', color: '#2F7D6D', issueCounter: 161 },
-        { name: 'Design', key: 'DES', color: '#B5582F', issueCounter: 2 },
-      ])
+      .values({ name: 'Engineering', key: 'DEV', color: '#2F7D6D', issueCounter: 161, createdAt: at('2026-09-01') })
+      .returning();
+    const [des] = await tx
+      .insert(teams)
+      .values({ name: 'Design', key: 'DES', color: '#B5582F', issueCounter: 2, createdAt: at('2026-09-02') })
       .returning();
     const team = { DEV: dev, DES: des };
 

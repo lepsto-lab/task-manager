@@ -24,19 +24,24 @@ function NavItem({ to, icon, label, count }: { to: string; icon: ReactNode; labe
 }
 
 function teamKeyFromPath(pathname: string): string | null {
-  const team = /^\/team\/([^/]+)/.exec(pathname);
-  if (team) return decodeURIComponent(team[1]);
-  const issue = /^\/issue\/([^/]+)/.exec(pathname);
-  return issue ? (parseIssueKey(decodeURIComponent(issue[1]))?.teamKey ?? null) : null;
+  try {
+    const team = /^\/team\/([^/]+)/.exec(pathname);
+    if (team) return decodeURIComponent(team[1]);
+    const issue = /^\/issue\/([^/]+)/.exec(pathname);
+    return issue ? (parseIssueKey(decodeURIComponent(issue[1]))?.teamKey ?? null) : null;
+  } catch {
+    return null;
+  }
 }
 
-export function Sidebar({ onNewIssue }: { onNewIssue?: () => void }) {
+export function Sidebar({ onNewIssue }: { onNewIssue?: (teamId?: string) => void }) {
   const { data: teams = [] } = useTeams();
   const { user, users, setUserId } = useCurrentUser();
   const { data: inbox } = useInbox(user?.id ?? null);
   const { pathname } = useLocation();
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const activeTeamKey = teamKeyFromPath(pathname);
+  const activeTeam = activeTeamKey ? teams.find((t) => t.key === activeTeamKey.toUpperCase()) : undefined;
 
   return (
     <nav className={styles.sidebar} aria-label="Main navigation">
@@ -48,7 +53,7 @@ export function Sidebar({ onNewIssue }: { onNewIssue?: () => void }) {
         <button type="button" className="icon-btn" aria-label="Search" title="Search is coming soon" disabled>
           <SearchIcon />
         </button>
-        <button type="button" className={styles.newIssue} aria-label="New issue" onClick={onNewIssue}>
+        <button type="button" className={styles.newIssue} aria-label="New issue" onClick={() => onNewIssue?.(activeTeam?.id)}>
           <PencilIcon />
         </button>
       </div>

@@ -34,6 +34,7 @@ export const teams = pgTable('teams', {
   key: text('key').notNull().unique(),
   color: text('color').notNull(),
   issueCounter: integer('issue_counter').notNull().default(0),
+  createdAt: createdAt(),
 });
 
 export const projects = pgTable('projects', {

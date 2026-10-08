@@ -25,11 +25,11 @@ describe('reference endpoints', () => {
     expect((res.json() as User[]).map((u) => u.name)).toEqual(['Alice Doe', 'Bob Roe']);
   });
 
-  it('lists teams with keys and colors', async () => {
+  it('lists teams in creation order with keys and colors', async () => {
     const teams = (await get('/api/teams')).json() as Team[];
     expect(teams).toEqual([
-      { id: fx.des.id, name: 'Design', key: 'DES', color: '#B5582F' },
       { id: fx.dev.id, name: 'Engineering', key: 'DEV', color: '#2F7D6D' },
+      { id: fx.des.id, name: 'Design', key: 'DES', color: '#B5582F' },
     ]);
   });
 

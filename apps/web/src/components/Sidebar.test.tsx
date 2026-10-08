@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { renderApp } from '../test/render';
 
@@ -34,6 +34,13 @@ describe('Sidebar', () => {
     renderApp('/issue/DES-1');
     expect(await screen.findByRole('button', { name: 'Design' })).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByRole('button', { name: 'Engineering' })).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('preselects the active team in the New issue dialog', async () => {
+    const { user } = renderApp('/team/DES/issues');
+    await user.click(await screen.findByRole('button', { name: 'New issue' }));
+    const dialog = screen.getByRole('dialog', { name: 'New issue' });
+    expect(within(dialog).getByRole('combobox', { name: 'Team' })).toHaveValue('t-des');
   });
 
   it("switches the current user, persists the choice and shows that user's inbox", async () => {

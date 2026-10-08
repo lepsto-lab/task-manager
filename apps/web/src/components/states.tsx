@@ -11,7 +11,15 @@ export function EmptyState({ title, description, action }: { title: string; desc
   );
 }
 
-export function ErrorState({ error, onRetry }: { error: Error; onRetry?: () => void }) {
+export function ErrorState({
+  error,
+  onRetry,
+  retryLabel = 'Retry',
+}: {
+  error: Error;
+  onRetry?: () => void;
+  retryLabel?: string;
+}) {
   return (
     <EmptyState
       title="Something went wrong"
@@ -19,7 +27,7 @@ export function ErrorState({ error, onRetry }: { error: Error; onRetry?: () => v
       action={
         onRetry && (
           <button type="button" className="btn" onClick={onRetry}>
-            Retry
+            {retryLabel}
           </button>
         )
       }
