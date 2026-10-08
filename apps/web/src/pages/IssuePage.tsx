@@ -1,5 +1,5 @@
 import type { ActivityEntry, CommentDto, IssueDetail, IssueStatus, IssueUpdateInput } from '@tm/shared';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { ApiError } from '../api/client';
 import { useAddComment, useDeleteIssue, useUpdateIssue } from '../api/mutations';
@@ -22,6 +22,7 @@ import { describeActivity } from '../lib/activityText';
 import { cx } from '../lib/cx';
 import { formatShortDate } from '../lib/format';
 import { useNewIssue } from '../lib/newIssue';
+import { useDraft } from '../lib/useDraft';
 import styles from './IssuePage.module.css';
 import { NotFound } from './NotFound';
 import page from './page.module.css';
@@ -98,23 +99,6 @@ function IssueDetailView({ issue }: { issue: IssueDetail }) {
       </div>
     </>
   );
-}
-
-function useDraft(value: string) {
-  const [draft, setDraft] = useState(value);
-  const [dirty, setDirty] = useState(false);
-  useEffect(() => {
-    if (!dirty) setDraft(value);
-  }, [value, dirty]);
-  const edit = (next: string) => {
-    setDraft(next);
-    setDirty(true);
-  };
-  const reset = () => {
-    setDraft(value);
-    setDirty(false);
-  };
-  return { draft, dirty, edit, reset, clean: () => setDirty(false) };
 }
 
 function TitleEditor({ value, onSave }: { value: string; onSave: (title: string) => void }) {

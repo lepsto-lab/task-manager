@@ -7,6 +7,7 @@ import type {
   IssueUpdateInput,
   Label,
   User,
+  ViewUpdateInput,
 } from '@tm/shared';
 import { applyPatch } from '../lib/applyPatch';
 import { useToast } from '../lib/toast';
@@ -108,5 +109,38 @@ export function useMarkRead(userId: string | null) {
       if (context?.previous) qc.setQueryData(context.key, context.previous);
     },
     onSettled: () => qc.invalidateQueries({ queryKey: ['inbox'] }),
+  });
+}
+
+export function useCreateProject() {
+  const qc = useQueryClient();
+  const toast = useToast();
+  return useMutation({
+    mutationFn: api.createProject,
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['projects'] }),
+    onError: (error) => toast.show(`Couldn't create project: ${error.message}`, 'error'),
+  });
+}
+
+export function useUpdateView(id: string) {
+  const qc = useQueryClient();
+  const toast = useToast();
+  return useMutation({
+    mutationFn: (input: ViewUpdateInput) => api.updateView(id, input),
+    onSuccess: (view) => {
+      qc.setQueryData(qk.view(id), view);
+      void qc.invalidateQueries({ queryKey: qk.views });
+    },
+    onError: (error) => toast.show(`Couldn't save view: ${error.message}`, 'error'),
+  });
+}
+
+export function useDeleteView() {
+  const qc = useQueryClient();
+  const toast = useToast();
+  return useMutation({
+    mutationFn: api.deleteView,
+    onSuccess: () => qc.invalidateQueries({ queryKey: qk.views }),
+    onError: (error) => toast.show(`Couldn't delete view: ${error.message}`, 'error'),
   });
 }
