@@ -57,3 +57,20 @@ export function useCreateView() {
   const qc = useQueryClient();
   return useMutation({ mutationFn: api.createView, onSuccess: () => qc.invalidateQueries({ queryKey: qk.views }) });
 }
+
+export function useDeleteIssue() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: api.deleteIssue,
+    // Detail queries are left alone so the open page does not refetch a 404 before navigating away.
+    onSuccess: () => invalidateIssueData(qc, ISSUE_DATA_KEYS.filter((key) => key !== 'issue')),
+  });
+}
+
+export function useAddComment() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ issueId, body }: { issueId: string; body: string }) => api.addComment(issueId, body),
+    onSuccess: () => invalidateIssueData(qc, ['issue', 'inbox']),
+  });
+}

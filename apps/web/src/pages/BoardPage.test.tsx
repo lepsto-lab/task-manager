@@ -65,7 +65,7 @@ describe('BoardPage', () => {
     await user.keyboard('{Escape}');
     link.focus();
     await user.keyboard('{Enter}');
-    expect(await screen.findByText('Page not found')).toBeInTheDocument();
+    expect(await screen.findByRole('textbox', { name: 'Issue title' })).toHaveValue('Export to CSV');
   });
 
   it('maps a column drop to a status and sortOrder patch', () => {
