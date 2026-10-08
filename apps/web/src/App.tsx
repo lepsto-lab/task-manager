@@ -8,7 +8,9 @@ import { NewIssueProvider } from './lib/newIssue';
 import { ToastProvider } from './lib/toast';
 import { BoardPage } from './pages/BoardPage';
 import { IssueListPage } from './pages/IssueListPage';
+import { InboxPage } from './pages/InboxPage';
 import { IssuePage } from './pages/IssuePage';
+import { MyIssuesPage } from './pages/MyIssuesPage';
 import { NotFound } from './pages/NotFound';
 
 export function AppProviders({ children }: { children: ReactNode }) {
@@ -36,6 +38,8 @@ export function AppRoutes() {
         <Route path="team/:teamKey/issues" element={<IssueListPage />} />
         <Route path="team/:teamKey/board" element={<BoardPage />} />
         <Route path="issue/:issueKey" element={<IssuePage />} />
+        <Route path="my-issues" element={<MyIssuesPage />} />
+        <Route path="inbox" element={<InboxPage />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

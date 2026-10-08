@@ -1,5 +1,13 @@
 import { useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
-import type { IssueDetail, IssueListItem, IssueUpdateInput, Label, User } from '@tm/shared';
+import type {
+  InboxReadInput,
+  InboxResponse,
+  IssueDetail,
+  IssueListItem,
+  IssueUpdateInput,
+  Label,
+  User,
+} from '@tm/shared';
 import { applyPatch } from '../lib/applyPatch';
 import { useToast } from '../lib/toast';
 import { api } from './client';
@@ -76,5 +84,29 @@ export function useAddComment() {
     mutationFn: ({ issueId, body }: { issueId: string; body: string }) => api.addComment(issueId, body),
     onSuccess: () => invalidateIssueData(qc, ['issue', 'inbox']),
     onError: (error) => toast.show(`Couldn't post comment: ${error.message}`, 'error'),
+  });
+}
+
+export function useMarkRead(userId: string | null) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: InboxReadInput) => api.markRead(input),
+    onMutate: async (input) => {
+      const key = qk.inbox(userId);
+      await qc.cancelQueries({ queryKey: key });
+      const previous = qc.getQueryData<InboxResponse>(key);
+      if (previous) {
+        const ids = 'all' in input ? null : new Set(input.activityIds);
+        const items = previous.items.map((item) =>
+          ids === null || ids.has(item.activity.id) ? { ...item, read: true } : item,
+        );
+        qc.setQueryData<InboxResponse>(key, { items, unreadCount: items.filter((i) => !i.read).length });
+      }
+      return { key, previous };
+    },
+    onError: (_error, _input, context) => {
+      if (context?.previous) qc.setQueryData(context.key, context.previous);
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: ['inbox'] }),
   });
 }

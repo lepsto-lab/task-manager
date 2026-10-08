@@ -1,0 +1,52 @@
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.item {
+  position: relative;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 16px 8px 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 0;
+  border-bottom: 1px solid var(--divider-soft);
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  text-align: left;
+}
+.item:hover {
+  background: var(--surface-hover);
+}
+.dot {
+  position: absolute;
+  left: 12px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.issueLine {
+  display: flex;
+  gap: 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.read .issueLine {
+  color: var(--text-muted);
+}
+.what {
+  font-size: 12px;
+  color: var(--text-muted);
+}
