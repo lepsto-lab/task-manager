@@ -1,3 +1,4 @@
+import fastifyStatic from '@fastify/static';
 import Fastify from 'fastify';
 import { ZodError } from 'zod';
 import type { DbOrTx } from './db/client';
@@ -20,9 +21,11 @@ declare module 'fastify' {
 export interface AppOptions {
   db: DbOrTx;
   logger?: boolean;
+  /** Directory of the built web app; when set, it is served with an SPA fallback. */
+  webDist?: string;
 }
 
-export async function buildApp({ db, logger = false }: AppOptions) {
+export async function buildApp({ db, logger = false, webDist }: AppOptions) {
   const app = Fastify({ logger });
   app.decorate('db', db);
 
@@ -44,9 +47,16 @@ export async function buildApp({ db, logger = false }: AppOptions) {
     return reply.status(500).send({ error: { code: 'internal', message: 'Internal server error' } });
   });
 
-  app.setNotFoundHandler((_req, reply) =>
-    reply.status(404).send({ error: { code: 'not_found', message: 'Route not found' } }),
-  );
+  if (webDist) {
+    await app.register(fastifyStatic, { root: webDist, wildcard: false });
+  }
+
+  app.setNotFoundHandler((req, reply) => {
+    if (webDist && req.method === 'GET' && !req.url.startsWith('/api/')) {
+      return reply.sendFile('index.html');
+    }
+    return reply.status(404).send({ error: { code: 'not_found', message: 'Route not found' } });
+  });
 
   await app.register(
     async (api) => {

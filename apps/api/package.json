@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "start": "tsx src/server.ts",
+    "start": "tsx scripts/start.ts",
     "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
@@ -15,6 +15,7 @@
     "db:seed": "tsx scripts/seed.ts"
   },
   "dependencies": {
+    "@fastify/static": "^10.1.5",
     "@tm/shared": "workspace:*",
     "dotenv": "^16.6.1",
     "drizzle-orm": "^0.45.4",
