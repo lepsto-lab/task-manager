@@ -1,0 +1,209 @@
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+.article {
+  flex: 999 1 480px;
+  min-width: 0;
+  padding: 40px 48px;
+}
+@media (max-width: 760px) {
+  .article {
+    padding: 24px 16px;
+  }
+}
+.content {
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.title {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  outline: none;
+}
+.description {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-body);
+  font-size: 14px;
+  line-height: 1.6;
+  resize: none;
+  outline: none;
+}
+.parentLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+}
+.subissues {
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.subHeader {
+  height: 36px;
+  padding: 0 8px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--group-bg);
+}
+.subHeader + .subRow {
+  border-top: 1px solid var(--panel-border);
+}
+.subTitle {
+  font-weight: 500;
+}
+.spacer {
+  flex: 1;
+}
+.subRow {
+  height: 38px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--divider-soft);
+}
+.subRow:last-child {
+  border-bottom: 0;
+}
+.subRow:hover {
+  background: var(--surface-hover);
+}
+.subKey {
+  width: 64px;
+  flex: none;
+}
+.subName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.subDone {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+.activity {
+  padding-top: 12px;
+  border-top: 1px solid var(--divider);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.activityTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+.event {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-muted);
+}
+.eventIcon {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.actor {
+  color: var(--text);
+}
+.comment {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+}
+.commentHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.commentAuthor {
+  font-weight: 500;
+}
+.commentBody {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-body);
+  white-space: pre-wrap;
+}
+.commentBox {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+}
+.commentBox textarea {
+  border: 0;
+  background: transparent;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+  outline: none;
+}
+.commentActions {
+  display: flex;
+  justify-content: flex-end;
+}
+.props {
+  flex: 1 1 280px;
+  padding: 20px 16px;
+  border-left: 1px solid var(--divider);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.propsTitle {
+  padding: 0 8px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+.propRow {
+  min-height: 34px;
+  padding-left: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.propLabel {
+  width: 88px;
+  flex: none;
+  color: var(--text-muted);
+}
+.propValue {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+}

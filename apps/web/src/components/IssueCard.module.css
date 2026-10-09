@@ -1,0 +1,42 @@
+.card {
+  position: relative;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+}
+.card:hover {
+  border-color: var(--card-hover-border);
+  background: var(--card-hover);
+}
+.overlay {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  cursor: grabbing;
+}
+.top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.key {
+  flex: 1;
+}
+.title {
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--text);
+}
+.title::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}

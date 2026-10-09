@@ -1,0 +1,31 @@
+.column {
+  width: 272px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: var(--radius-md);
+}
+.over {
+  background: rgba(94, 99, 230, 0.06);
+}
+.header {
+  height: 32px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.name {
+  font-weight: 500;
+}
+.spacer {
+  flex: 1;
+}
+.cards {
+  min-height: 60px;
+  padding-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

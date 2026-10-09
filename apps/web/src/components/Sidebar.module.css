@@ -1,0 +1,137 @@
+.sidebar {
+  width: 100%;
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+@media (min-width: 800px) {
+  .sidebar {
+    width: 232px;
+    flex: none;
+    overflow-y: auto;
+  }
+}
+.workspace {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 6px;
+}
+.logo {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 12px;
+}
+.workspaceName {
+  flex: 1;
+  font-weight: 600;
+}
+.newIssue {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--surface-border);
+  border-radius: 6px;
+  background: #141417;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.newIssue:hover {
+  background: var(--btn-hover);
+}
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.heading {
+  padding: 0 8px 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.item {
+  width: 100%;
+  height: 30px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  text-align: left;
+}
+.item svg {
+  color: var(--text-muted);
+  flex: none;
+}
+.item:hover:not(:disabled) {
+  background: var(--nav-hover);
+  color: var(--text);
+}
+.item:disabled {
+  color: var(--text-muted);
+}
+.active,
+.active:hover {
+  background: var(--nav-active);
+  color: var(--text-strong);
+}
+.label {
+  flex: 1;
+}
+.count {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.team {
+  composes: item;
+  font-weight: 500;
+}
+.chevron {
+  transition: transform 0.15s;
+}
+.chevronOpen {
+  composes: chevron;
+  transform: rotate(90deg);
+}
+.sub {
+  composes: item;
+  padding-left: 34px;
+}
+.footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.userSwitch {
+  height: 30px;
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.userSelect {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+}
+.userSelect option {
+  background: var(--panel);
+}

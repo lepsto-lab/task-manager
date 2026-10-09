@@ -1,0 +1,9 @@
+packages:
+  - apps/*
+  - packages/*
+allowBuilds:
+  esbuild: true
+  msw: false
+minimumReleaseAgeExclude:
+  - concurrently@9.2.5
+  - drizzle-orm@0.45.4

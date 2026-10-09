@@ -1,0 +1,21 @@
+.toggle {
+  display: flex;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.option {
+  width: 32px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+.option:hover {
+  color: var(--text);
+}
+.active {
+  background: var(--chip-active-bg);
+  color: var(--text);
+}
